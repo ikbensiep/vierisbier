@@ -19,9 +19,6 @@ define([
         // the view already present in the HTML.
         el: $("#vierisbierapp"),
 
-        // Our template for the line of statistics at the bottom of the app.
-        statsTemplate: _.template($('#stats-template').html()),
-
         // Delegated events for creating new items, and clearing completed ones.
         events: {
             "keypress #new-player":     "createOnEnter",
@@ -57,8 +54,8 @@ define([
             this.players.fetch();
         },
 
-        // Re-rendering the App just means refreshing the statistics -- the rest
-        // of the app doesn't change.
+        // Re-rendering the view just means refreshing the statistics -- the rest
+        // of the view doesn't change.
         render: function()
         {
             var done = this.players.done().length;
@@ -68,19 +65,12 @@ define([
             {
                 this.main.show();
 
-                $('.player-count .count').text(remaining);
-
-                /*
-                this.footer.show();
-                this.footer.html(this.statsTemplate({
-                    done: done,
-                    remaining: remaining
-                }));
-                */
+                // update player count
+                this.$('.player-count .count').text(remaining);
             }
             else
             {
-                //this.footer.hide();
+                // no players
             }
 
             this.allCheckbox.checked = !remaining;

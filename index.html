@@ -19,7 +19,6 @@
             <section id="main">
                
                 
-
                 <div class="game-board">
                     <h1>Vier is bier!</h1>
                     <h2 class="round-response"></h2>   
@@ -42,7 +41,6 @@
                     
                     </section>
                     <div style="clear:both"></div>
-                    
                     
                     
                     <div class="photos">
@@ -74,25 +72,6 @@
 
         </div>
 
-        <!-- Templates -->
-
-        <script type="text/template" id="player-template">
-            <div class="view">
-                <input class="toggle" title="Done" type="checkbox" <%= done ? 'checked="checked"' : '' %> />
-                <input class="paused" title="Paused" type="checkbox" <%= paused ? 'checked="checked"' : '' %> />
-                
-                <label><%= name %> <span class="score"><%= score %></span></label>
-                <a class="destroy"></a>
-            </div>
-            <input class="edit" type="text" value="<%=  name %>" />
-        </script>
-
-            <script type="text/template" id="stats-template">
-            <% if (done) { %>
-                <a id="clear-completed">Clear <%= done %> completed <%= done == 1 ? 'player' : 'players' %></a>
-            <% } %>
-            <span class="count"><%= remaining %></span> active <%= remaining == 1 ? 'player' : 'players' %>
-        </script>
 
         <script src="js/libs/require-min.js" data-main="js/app.js"></script>
 

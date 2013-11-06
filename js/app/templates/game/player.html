@@ -1,0 +1,9 @@
+<div class="view">
+    <input class="toggle" title="Done" type="checkbox" <%= done ? 'checked="checked"' : '' %> />
+    <input class="paused" title="Paused" type="checkbox" <%= paused ? 'checked="checked"' : '' %> />
+    
+    <label><%= name %> <span class="score"><%= score %></span></label>
+    <a class="destroy"></a>
+</div>
+
+<input class="edit" type="text" value="<%=  name %>" />
