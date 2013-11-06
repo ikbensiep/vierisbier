@@ -3,8 +3,12 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'models/game'
-], function(module, $, _, Backbone, GameModel){
+  'collections/players',
+  'collections/responses',
+  'models/game',
+  'views/player'
+], function(module, $, _, Backbone, Players, Responses, GameModel,
+            PlayerView){
 
     // Game View
     // ---------------
@@ -15,11 +19,137 @@ define([
         // the view already present in the HTML.
         el: $("#vierisbierapp"),
 
+        // Our template for the line of statistics at the bottom of the app.
+        statsTemplate: _.template($('#stats-template').html()),
+
+        // Delegated events for creating new items, and clearing completed ones.
+        events: {
+            "keypress #new-player":     "createOnEnter",
+            "keypress":                 "createOnSpace",
+            "click #clear-completed":   "clearCompleted",
+            "click #toggle-all":        "toggleAllComplete",
+            "click .play":              "playRound",
+        },
+
         initialize: function(options)
         {
-            this.players = options.players;
-            this.responses = options.responses;
             this.model = new GameModel();
+
+            this.input = this.$("#new-player");
+            this.allCheckbox = this.$("#toggle-all")[0];
+
+            // TODO: footer here is only used to pass the number of players.
+            // move to div.score-card 
+
+            this.main = $('#main');
+
+            // setup responses collection
+            this.responses = new Responses();
+            this.responses.createSomeResponses();
+
+            // setup and listen to players collection
+            this.players = Players;
+            this.listenTo(this.players, 'add', this.addOne);
+            this.listenTo(this.players, 'reset', this.addAll);
+            this.listenTo(this.players, 'all', this.render);
+
+            // fetch players collection (from local storage)
+            this.players.fetch();
+        },
+
+        // Re-rendering the App just means refreshing the statistics -- the rest
+        // of the app doesn't change.
+        render: function()
+        {
+            var done = this.players.done().length;
+            var remaining = this.players.remaining().length;
+
+            if (this.players.length)
+            {
+                this.main.show();
+
+                $('.player-count .count').text(remaining);
+
+                /*
+                this.footer.show();
+                this.footer.html(this.statsTemplate({
+                    done: done,
+                    remaining: remaining
+                }));
+                */
+            }
+            else
+            {
+                //this.footer.hide();
+            }
+
+            this.allCheckbox.checked = !remaining;
+        },
+
+        // If you hit return in the main input field, create new Player model,
+        // persisting it to localStorage.
+        createOnEnter: function(e)
+        {
+            if (e.keyCode != 13) return;
+            if (!this.input.val()) return;
+
+            // add new player
+            this.players.create({name: this.input.val()});
+            this.input.val('');
+        },
+
+        // If you hit spacebar, play new round
+        createOnSpace: function(e) 
+        {
+            if (this.$('#new-player').is(":focus"))
+            {
+                return;
+            } 
+            if (e.keyCode == 32)
+            { 
+                this.playRound(e);
+            }
+        },
+
+        // If you click the play button, play new round
+        playRound: function(e)
+        {
+            this.roll();
+        },
+
+        // Clear all players, destroying their models.
+        clearCompleted: function()
+        {
+            _.invoke(this.players.done(), 'destroy');
+
+            return false;
+        },
+
+        toggleAllComplete: function ()
+        {
+            var done = this.allCheckbox.checked;
+
+            // save all players
+            this.players.each(function (player)
+            {
+                player.save({'done': done});
+            });
+        },
+
+        // Add a single player to the list by creating a view for it, and
+        // appending its element to the `<ul>`.
+        addOne: function(player)
+        {
+            var view = new PlayerView({model: player});
+    
+            // add to dom
+            this.$("#player-list").append(view.render().el);
+        },
+
+        // Add all items in the Players collection at once.
+        addAll: function()
+        {
+            this.players.each(this.addOne, this);
         },
 
         // Play a game round

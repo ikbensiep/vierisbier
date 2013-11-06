@@ -2,7 +2,7 @@ define([
   'module',
   'underscore',
   'backbone',
-  'models/response',
+  'models/response'
 ], function(module, _, Backbone, Response){
 
 	// Responses Collection
@@ -31,6 +31,39 @@ define([
                 paused: paused
             }));
         },
+
+        // add some test responses for testing
+        createSomeResponses: function()
+        {
+            // some responses that should be coming from a database at startup
+            // or something
+            this.add([
+                {
+                    // won and not paused
+                    description: "Keep em coming %(name)s!",
+                    victory: true,
+                    paused: false
+                },
+                {
+                    // didn't win and not paused
+                    description: "Go home %(name)s!",
+                    victory: false,
+                    paused: false
+                },
+                {
+                    // won but paused
+                    description: "You won %(name)s, but you're asleep?!",
+                    victory: true,
+                    paused: true
+                },
+                {
+                    // didn't win and also paused
+                    description: "Tough luck, and %(name)s is in coma anyway...",
+                    victory: false,
+                    paused: true
+                }
+            ]);
+        }
 
     });
 
