@@ -40,6 +40,7 @@ define([
             this.instructions = this.$("#instructions");
             this.allCheckbox = this.$("#toggle-all")[0];
             this.playerCount = this.$('.player-count .count');
+            this.playersTotalScore = this.$('.players-total-score .count');
             this.roundCount = this.$('.game-round .count');
             this.roundResponse = this.$(".round-response");
             this.playButton = this.$("button.play");
@@ -92,6 +93,9 @@ define([
 
                 // update player count
                 this.playerCount.text(remaining);
+
+                // update players total score
+                this.playersTotalScore.text(this.players.totalScore());
             }
  
             this.allCheckbox.checked = !remaining;
@@ -128,13 +132,16 @@ define([
             this.roll();
         },
 
-        // Clear all players, destroying their models.
+        // Clear all players, destroying their models with lasers.
         clearCompleted: function()
         {
+            // destroy all models
             _.invoke(this.players.done(), 'destroy');
 
-            // reset ui
+            // no players, reset/hide game ui
             this.allCheckbox.checked = false;
+            this.playButton.hide();
+            this.instructions.hide();
 
             return false;
         },

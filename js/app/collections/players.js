@@ -40,6 +40,14 @@ define([
             });
         },
 
+        // Get the total score of all players combined.
+        totalScore: function()
+        {
+            var scores = this.pluck("score");
+
+            return _.reduce(scores, function(memo, num){ return memo + num; }, 0);
+        },
+
         // We keep the players in sequential order, despite being saved by unordered
         // GUID in the database. This generates the next order number for new items.
         nextOrder: function()
