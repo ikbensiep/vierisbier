@@ -29,10 +29,15 @@ body {
 	
 }
 
+#header {
+	background: rgba(255,255,255,0.4);
+	line-height: 50px;
+	padding-left: 40px;
+}
+
 #player-list {
 	margin: 0px 0 10px 0px;
 	padding: 0;
-	
 }
 
 #player-list li {

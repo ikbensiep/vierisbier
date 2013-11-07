@@ -3,8 +3,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'views/header',
   'views/game'
-], function(module, $, _, Backbone, GameView){
+], function(module, $, _, Backbone, HeaderView, GameView){
 
     // The Application
     // ---------------
@@ -16,8 +17,14 @@ define([
 
         render: function()
         {
+            // setup header
+            this.header = new HeaderView();
+            this.header.render();
+
             // initialize the game
             this.game = new GameView();
+
+            return this;
         },
 
     });
