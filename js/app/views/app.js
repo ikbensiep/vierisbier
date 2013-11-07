@@ -10,7 +10,7 @@ define([
     // The Application
     // ---------------
 
-    // Our overall AppView is the top-level piece of UI.
+    // The overall AppView is the top-level piece of UI.
     var AppView = Backbone.View.extend(
     {
         el: $("body"),
@@ -21,8 +21,13 @@ define([
             this.header = new HeaderView();
             this.header.render();
 
+            // XXX: setup content
+
             // initialize the game
+            // XXX: game should be part of content
             this.game = new GameView();
+
+            // XXX: setup footer
 
             return this;
         },
