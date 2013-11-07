@@ -3,23 +3,175 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'models/game'
-], function(module, $, _, Backbone, GameModel){
+  'collections/players',
+  'collections/responses',
+  'models/game',
+  'views/player',
+  'text!templates/game/main.html!strip'
+], function(module, $, _, Backbone, Players, Responses, GameModel,
+            PlayerView, GameTemplate){
 
     // Game View
     // ---------------
 
     var GameView = Backbone.View.extend(
     {
-        // Instead of generating a new element, bind to the existing skeleton of
-        // the view already present in the HTML.
-        el: $("#vierisbierapp"),
+        el: $("#game"),
+
+        events: {
+            "keypress #new-player":     "createOnEnter",
+            "keypress":                 "createOnSpace",
+            "click #clear-completed":   "clearCompleted",
+            "click #toggle-all":        "toggleAllComplete",
+            "click .play":              "playRound",
+        },
 
         initialize: function(options)
         {
-            this.players = options.players;
-            this.responses = options.responses;
+            // render template
+            this.$el.html(_.template(GameTemplate));
+
+            // setup game model
             this.model = new GameModel();
+
+            // get references to elements
+            this.main = this.$('#main');
+            this.input = this.$("#new-player");
+            this.instructions = this.$("#instructions");
+            this.allCheckbox = this.$("#toggle-all")[0];
+            this.playerCount = this.$('.player-count .count');
+            this.playersTotalScore = this.$('.players-total-score .count');
+            this.roundCount = this.$('.game-round .count');
+            this.roundResponse = this.$(".round-response");
+            this.playButton = this.$("button.play");
+
+            // initally hide game ui
+            this.playButton.hide();
+            this.instructions.hide();
+
+            // setup responses collection
+            this.responses = new Responses();
+
+            // create some dummy response data
+            this.responses.createSomeResponses();
+
+            // setup and listen to players collection
+            this.players = new Players();
+            this.listenTo(this.players, 'add', this.addOne);
+            this.listenTo(this.players, 'reset', this.addAll);
+            this.listenTo(this.players, 'all', this.render);
+
+            // fetch players collection (from local storage)
+            this.players.fetch();
+        },
+
+        // Re-rendering the view just means refreshing the statistics -- the rest
+        // of the view doesn't change.
+        render: function()
+        {
+            var done = this.players.done().length;
+            var remaining = this.players.remaining().length;
+
+            if (this.players.length)
+            {
+                // show the game interface
+                this.main.show();
+
+                // check if there are players
+                if (this.players.length > 0)
+                {
+                    // show game gui
+                    this.playButton.show();
+                    this.instructions.show();
+                }
+                else
+                {
+                    // no players, hide game ui
+                    this.playButton.hide();
+                    this.instructions.hide();
+                }
+
+                // update player count
+                this.playerCount.text(remaining);
+
+                // update players total score
+                this.playersTotalScore.text(this.players.totalScore());
+            }
+ 
+            this.allCheckbox.checked = !remaining;
+        },
+
+        // If you hit return in the main input field, create new Player model,
+        // persisting it to localStorage.
+        createOnEnter: function(e)
+        {
+            if (e.keyCode != 13) return;
+            if (!this.input.val()) return;
+
+            // add new player
+            this.players.create({name: this.input.val()});
+            this.input.val('');
+        },
+
+        // If you hit spacebar, play new round
+        createOnSpace: function(e) 
+        {
+            if (this.$('#new-player').is(":focus"))
+            {
+                return;
+            } 
+            if (e.keyCode == 32)
+            { 
+                this.playRound(e);
+            }
+        },
+
+        // If you click the play button, play new round
+        playRound: function(e)
+        {
+            this.roll();
+        },
+
+        // Clear all players, destroying their models with lasers.
+        clearCompleted: function()
+        {
+            // destroy all models
+            _.invoke(this.players.done(), 'destroy');
+
+            // no players, reset/hide game ui
+            this.allCheckbox.checked = false;
+            this.playButton.hide();
+            this.instructions.hide();
+
+            return false;
+        },
+
+        // Select all players
+        toggleAllComplete: function()
+        {
+            var done = this.allCheckbox.checked;
+
+            // save all players
+            this.players.each(function (player)
+            {
+                player.save({'done': done});
+            });
+        },
+
+        // Add a single player to the list by creating a view for it, and
+        // appending its element to the `<ul>`.
+        addOne: function(player)
+        {
+            var view = new PlayerView({model: player});
+
+            // add to dom
+            this.$("#player-list").append(view.render().el);
+        },
+
+        // Add all items in the Players collection at once.
+        addAll: function()
+        {
+            this.players.each(this.addOne, this);
         },
 
         // Play a game round
@@ -28,7 +180,7 @@ define([
             // set round number for game, incrementing by 1
             // TODO: round numbers increases after everybody's had a turn?
             this.model.set('round', this.model.get('round') + 1);
-            this.$('.game-round .count').text(this.model.get('round'));
+            this.roundCount.text(this.model.get('round'));
 
             // go to next player
             this.currentPlayer = this.players.at(this.model.get('currentUser'));
@@ -43,20 +195,21 @@ define([
                 this.model.set('currentUser', 0);
             }
 
+            // set root node class to rolling, hide PLAY button with css accordingly
+            this.$el.addClass("rolling").removeClass('bier');
+            this.playButton.attr('disabled', 'disabled');
+
+            // reset response
+            this.roundResponse.text('');
+
             // set countdown for animation interval
             this.model.set('countDown', 10);
 
-            // set root node class to rolling, hide PLAY button with css accordingly
-            this.$el.addClass("rolling").removeClass('bier');
-            this.$("button.play").attr('disabled', 'disabled');
-
-            // reset response
-            this.$(".round-response").text('');
-
-            // start roll dice animation    
+            // start roll dice animation
             this.interval = setInterval(_.bind(this._rollDice, this), 80);
         },
 
+        // Invoked x times by timer
         _rollDice: function()
         {
             // increment dice roll animation count
@@ -76,7 +229,7 @@ define([
                 this.$el.removeClass("rolling");
 
                 // disable ui
-                this.$("button.play").attr('disabled', null);
+                this.playButton.attr('disabled', null);
 
                 var response;
 
@@ -125,7 +278,7 @@ define([
 
                 // show response with player data
                 response = response.toString(this.currentPlayer);
-                this.$(".round-response").text(response);
+                this.roundResponse.text(response);
             }
         },
 

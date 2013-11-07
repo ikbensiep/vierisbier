@@ -13,12 +13,14 @@ define([
     // server.
     var PlayerList = Backbone.Collection.extend(
     {
-
         // Reference to this collection's model.
         model: Player,
 
         // Save all of the players under a dedicated namespace.
         localStorage: new Backbone.LocalStorage("vierisbier"),
+
+        // Players are sorted by the order they joined.
+        comparator: 'order',
 
         // Filter down the list of all players that are finished,
         // regardless whether they are paused or not.
@@ -38,6 +40,14 @@ define([
             });
         },
 
+        // Get the total score of all players combined.
+        totalScore: function()
+        {
+            var scores = this.pluck("score");
+
+            return _.reduce(scores, function(memo, num){ return memo + num; }, 0);
+        },
+
         // We keep the players in sequential order, despite being saved by unordered
         // GUID in the database. This generates the next order number for new items.
         nextOrder: function()
@@ -48,13 +58,10 @@ define([
             }
 
             return this.last().get('order') + 1;
-        },
-
-        // Players are sorted by the order they joined.
-        comparator: 'order'
+        }
 
     });
 
-	return new PlayerList;
+	return PlayerList;
 });
 

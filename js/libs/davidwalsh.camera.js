@@ -14,13 +14,13 @@ window.addEventListener("DOMContentLoaded", function() {
 		navigator.getUserMedia(videoObj, function(stream) {
 			video.src = stream;
 			video.play();
-			setTimeout(function(){ $("#vierisbierapp").addClass("user-media");} ,1000);
+			setTimeout(function(){ $("#game").addClass("user-media");} ,1000);
 		}, errBack);
 	} else if(navigator.webkitGetUserMedia) { // WebKit-prefixed
 		navigator.webkitGetUserMedia(videoObj, function(stream){
 			video.src = window.webkitURL.createObjectURL(stream);
 			video.play();
-			setTimeout(function(){ $("#vierisbierapp").addClass("user-media");} ,1000);
+			setTimeout(function(){ $("#game").addClass("user-media");} ,1000);
 		}, errBack);
 	}
 

@@ -40,6 +40,7 @@ require.config({
 		underscore: 				'libs/underscore-min',
 		backbone: 					'libs/backbone-min',
 		backboneLocalstorage: 		'libs/backbone.localStorage',
+		bootstrap: 					'libs/bootstrap.min',
 		sprintf: 				    'libs/sprintf.min',
 		camera: 					'libs/davidwalsh.camera',
 		text: 						'libs/text'
@@ -67,7 +68,11 @@ require.config({
 	        deps: 		["jquery"],
 	        exports: 	"jqueryScrollTo"
 	    },
-	    
+
+	    bootstrap: {
+	        exports: 	"Bootstrap"
+	    },
+
 	    sprintf: {
 	        exports: 	"sprintf"
 	    },

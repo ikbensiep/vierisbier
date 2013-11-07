@@ -3,8 +3,9 @@ define([
   'jquery',
   'jqueryScrollTo',
   'underscore',
-  'backbone'
-], function(module, $, jqueryScrollTo, _, Backbone){
+  'backbone',
+  'text!templates/game/player.html!strip'
+], function(module, $, jqueryScrollTo, _, Backbone, PlayerTemplate){
 
     // Player Item View
     // --------------
@@ -13,9 +14,6 @@ define([
     var PlayerView = Backbone.View.extend(
     {
         tagName: "li",
-
-        // Cache the template function for a single player
-        template: _.template($('#player-template').html()),
 
         // The DOM events specific to an item.
         events: {
@@ -32,6 +30,7 @@ define([
         // app, we set a direct reference on the model for convenience.
         initialize: function()
         {
+            // listen for model changes
             this.listenTo(this.model, 'change', this.render);
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'setPlayer', this.setPlayer);
@@ -43,7 +42,7 @@ define([
             console.info('render update for player:', this.model.get('name'));
 
             // render template with injected model data
-            this.$el.html(this.template(this.model.toJSON()));
+            this.$el.html(_.template(PlayerTemplate, this.model.toJSON()));
 
             // toggle done state
             this.$el.toggleClass('done', this.model.get('done'));
@@ -53,6 +52,7 @@ define([
 
             // set input
             this.input = this.$('.edit');
+
             return this;
         },
 
