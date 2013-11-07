@@ -37,14 +37,21 @@ define([
             // get references to elements
             this.main = this.$('#main');
             this.input = this.$("#new-player");
+            this.instructions = this.$("#instructions");
             this.allCheckbox = this.$("#toggle-all")[0];
             this.playerCount = this.$('.player-count .count');
             this.roundCount = this.$('.game-round .count');
             this.roundResponse = this.$(".round-response");
             this.playButton = this.$("button.play");
 
+            // initally hide game ui
+            this.playButton.hide();
+            this.instructions.hide();
+
             // setup responses collection
             this.responses = new Responses();
+
+            // create some dummy response data
             this.responses.createSomeResponses();
 
             // setup and listen to players collection
@@ -66,16 +73,27 @@ define([
 
             if (this.players.length)
             {
+                // show the game interface
                 this.main.show();
+
+                // check if there are players
+                if (this.players.length > 0)
+                {
+                    // show game gui
+                    this.playButton.show();
+                    this.instructions.show();
+                }
+                else
+                {
+                    // no players, hide game ui
+                    this.playButton.hide();
+                    this.instructions.hide();
+                }
 
                 // update player count
                 this.playerCount.text(remaining);
             }
-            else
-            {
-                // no players
-            }
-
+ 
             this.allCheckbox.checked = !remaining;
         },
 
@@ -114,6 +132,9 @@ define([
         clearCompleted: function()
         {
             _.invoke(this.players.done(), 'destroy');
+
+            // reset ui
+            this.allCheckbox.checked = false;
 
             return false;
         },

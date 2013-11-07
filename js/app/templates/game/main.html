@@ -7,7 +7,7 @@
 
         <section class="score-card">
             <!-- XXX: needs to go template, the word 'Players' should be 'Player' if players.length == 1 -->
-            <h4 class="player-count"><span class="count"></span> Players</h4>
+            <h4 class="player-count"><span class="count">0</span> Players</h4>
             <h4 class="game-round">Round <span class="count">0</span></h4>
 
             <div class="player-list">
@@ -41,11 +41,10 @@
 
 </section>
 
-<footer>
-    <a id="clear-completed">Clear completed</a>
-</footer>
+<footer></footer>
 
 <section id="instructions">
     <input id="toggle-all" type="checkbox">
-    <label for="toggle-all">Mark all as complete</label>
+    <label for="toggle-all">Mark all as done</label>
+    <a id="clear-completed">Clear completed</a>
 </section>
