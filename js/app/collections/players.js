@@ -20,6 +20,9 @@ define([
         // Save all of the players under a dedicated namespace.
         localStorage: new Backbone.LocalStorage("vierisbier"),
 
+        // Players are sorted by the order they joined.
+        comparator: 'order',
+
         // Filter down the list of all players that are finished,
         // regardless whether they are paused or not.
         done: function()
@@ -48,13 +51,10 @@ define([
             }
 
             return this.last().get('order') + 1;
-        },
-
-        // Players are sorted by the order they joined.
-        comparator: 'order'
+        }
 
     });
 
-	return new PlayerList;
+	return PlayerList;
 });
 

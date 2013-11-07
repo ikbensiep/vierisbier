@@ -35,20 +35,20 @@ define([
             this.model = new GameModel();
 
             // get references to elements
+            this.main = this.$('#main');
             this.input = this.$("#new-player");
             this.allCheckbox = this.$("#toggle-all")[0];
-
-            // TODO: footer here is only used to pass the number of players.
-            // move to div.score-card 
-
-            this.main = $('#main');
+            this.playerCount = this.$('.player-count .count');
+            this.roundCount = this.$('.game-round .count');
+            this.roundResponse = this.$(".round-response");
+            this.playButton = this.$("button.play");
 
             // setup responses collection
             this.responses = new Responses();
             this.responses.createSomeResponses();
 
             // setup and listen to players collection
-            this.players = Players;
+            this.players = new Players();
             this.listenTo(this.players, 'add', this.addOne);
             this.listenTo(this.players, 'reset', this.addAll);
             this.listenTo(this.players, 'all', this.render);
@@ -69,7 +69,7 @@ define([
                 this.main.show();
 
                 // update player count
-                this.$('.player-count .count').text(remaining);
+                this.playerCount.text(remaining);
             }
             else
             {
@@ -135,7 +135,7 @@ define([
         addOne: function(player)
         {
             var view = new PlayerView({model: player});
-    
+
             // add to dom
             this.$("#player-list").append(view.render().el);
         },
@@ -152,7 +152,7 @@ define([
             // set round number for game, incrementing by 1
             // TODO: round numbers increases after everybody's had a turn?
             this.model.set('round', this.model.get('round') + 1);
-            this.$('.game-round .count').text(this.model.get('round'));
+            this.roundCount.text(this.model.get('round'));
 
             // go to next player
             this.currentPlayer = this.players.at(this.model.get('currentUser'));
@@ -167,17 +167,17 @@ define([
                 this.model.set('currentUser', 0);
             }
 
+            // set root node class to rolling, hide PLAY button with css accordingly
+            this.$el.addClass("rolling").removeClass('bier');
+            this.playButton.attr('disabled', 'disabled');
+
+            // reset response
+            this.roundResponse.text('');
+
             // set countdown for animation interval
             this.model.set('countDown', 10);
 
-            // set root node class to rolling, hide PLAY button with css accordingly
-            this.$el.addClass("rolling").removeClass('bier');
-            this.$("button.play").attr('disabled', 'disabled');
-
-            // reset response
-            this.$(".round-response").text('');
-
-            // start roll dice animation    
+            // start roll dice animation
             this.interval = setInterval(_.bind(this._rollDice, this), 80);
         },
 
@@ -201,7 +201,7 @@ define([
                 this.$el.removeClass("rolling");
 
                 // disable ui
-                this.$("button.play").attr('disabled', null);
+                this.playButton.attr('disabled', null);
 
                 var response;
 
@@ -250,7 +250,7 @@ define([
 
                 // show response with player data
                 response = response.toString(this.currentPlayer);
-                this.$(".round-response").text(response);
+                this.roundResponse.text(response);
             }
         },
 
