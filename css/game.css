@@ -10,7 +10,7 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
-#vierisbierapp {
+#game {
 
 }
 
@@ -19,7 +19,7 @@ body {
 	height: 2em;
 }
 
-#vierisbierapp input[type="text"] {
+#game input[type="text"] {
 	outline: none;
 	padding: 2px;
 	background: transparent; 	
@@ -109,7 +109,7 @@ body {
 	display: none;
 }
 
-#vierisbierapp footer {
+#game footer {
 	display: none;
 	margin: 0 -20px -20px -20px;
 	overflow: hidden;

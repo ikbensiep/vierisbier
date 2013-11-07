@@ -16,7 +16,7 @@ define([
 
     var GameView = Backbone.View.extend(
     {
-        el: $("#vierisbierapp"),
+        el: $("#game"),
 
         events: {
             "keypress #new-player":     "createOnEnter",
