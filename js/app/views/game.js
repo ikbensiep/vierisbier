@@ -6,20 +6,18 @@ define([
   'collections/players',
   'collections/responses',
   'models/game',
-  'views/player'
+  'views/player',
+  'text!templates/game/main.html!strip'
 ], function(module, $, _, Backbone, Players, Responses, GameModel,
-            PlayerView){
+            PlayerView, GameTemplate){
 
     // Game View
     // ---------------
 
     var GameView = Backbone.View.extend(
     {
-        // Instead of generating a new element, bind to the existing skeleton of
-        // the view already present in the HTML.
         el: $("#vierisbierapp"),
 
-        // Delegated events for creating new items, and clearing completed ones.
         events: {
             "keypress #new-player":     "createOnEnter",
             "keypress":                 "createOnSpace",
@@ -30,8 +28,13 @@ define([
 
         initialize: function(options)
         {
+            // render template
+            this.$el.html(_.template(GameTemplate));
+
+            // setup game model
             this.model = new GameModel();
 
+            // get references to elements
             this.input = this.$("#new-player");
             this.allCheckbox = this.$("#toggle-all")[0];
 
@@ -115,7 +118,8 @@ define([
             return false;
         },
 
-        toggleAllComplete: function ()
+        // Select all players
+        toggleAllComplete: function()
         {
             var done = this.allCheckbox.checked;
 
@@ -177,6 +181,7 @@ define([
             this.interval = setInterval(_.bind(this._rollDice, this), 80);
         },
 
+        // Invoked x times by timer
         _rollDice: function()
         {
             // increment dice roll animation count

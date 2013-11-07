@@ -15,9 +15,6 @@ define([
     {
         tagName: "li",
 
-        // Cache the template function for a single player
-        //template: _.template($('#player-template').html()),
-
         // The DOM events specific to an item.
         events: {
             "click .toggle":    "toggleDone",
@@ -55,6 +52,7 @@ define([
 
             // set input
             this.input = this.$('.edit');
+
             return this;
         },
 
